@@ -1,194 +1,80 @@
 #define F_CPU 2000000UL
 
+#define MSG "HJKLMNOPQRSTUVWXYZ"
+
 #include <avr/io.h>
 #include <util/delay.h>
 
-#define LED1 (1<<PB0) 
-#define LED2 (1<<PB1)
-#define LED3 (1<<PB2)
-#define LED4 (1<<PB3)
-#define LED5 (1<<PB4)
-#define LED6 (1<<PB5)
-#define LED7 (1<<PB6)
-#define LED8 (1<<PB7)
-#define LED9 (1<<PD0)
-#define LED10 (1<<PD1)
-#define LED11 (1<<PD2)
-#define LED12 (1<<PD3)
-#define LED13 (1<<PD4)
-#define LED14 (1<<PD5)
-#define LED15 (1<<PD6)
-#define LED16 (1<<PD7)
-
-void change_LED(int num,int on){
-    if(on){
-        switch(num){
-            case 1:
-                PORTB |= LED1;
-                break;
-            case 2:
-                PORTB |= LED2;
-                break;
-            case 3:
-                PORTB |= LED3;
-                break;
-            case 4:
-                PORTB |= LED4;
-                break;
-            case 5:
-                PORTB |= LED5;
-                break;
-            case 6:
-                PORTB |= LED6;
-                break;
-            case 7:
-                PORTB |= LED7;
-                break;
-            case 8:
-                PORTB |= LED8;
-                break;
-            case 9:
-                PORTD |= LED9;
-                break;
-            case 10:
-                PORTD |= LED10;
-                break;
-            case 11:
-                PORTD |= LED11;
-                break;
-            case 12:
-                PORTD |= LED12;
-                break;
-            case 13:
-                PORTD |= LED13;
-                break;
-            case 14:
-                PORTD |= LED14;
-                break;
-            case 15:
-                PORTD |= LED15;
-                break;
-            case 16:
-                PORTD |= LED16;
-                break;
-        }
-    }
-    else{
-        switch(num){
-            case 1:
-                PORTB &= ~LED1;
-                break;
-            case 2:
-                PORTB &= ~LED2;
-                break;
-            case 3:
-                PORTB &= ~LED3;
-                break;
-            case 4:
-                PORTB &= ~LED4;
-                break;
-            case 5:
-                PORTB &= ~LED5;
-                break;
-            case 6:
-                PORTB &= ~LED6;
-                break;
-            case 7:
-                PORTB &= ~LED7;
-                break;
-            case 8:
-                PORTB &= ~LED8;
-                break;
-            case 9:
-                PORTD &= ~LED9;
-                break;
-            case 10:
-                PORTD &= ~LED10;
-                break;
-            case 11:
-                PORTD &= ~LED11;
-                break;
-            case 12:
-                PORTD &= ~LED12;
-                break;
-            case 13:
-                PORTD &= ~LED13;
-                break;
-            case 14:
-                PORTD &= ~LED14;
-                break;
-            case 15:
-                PORTD &= ~LED15;
-                break;
-            case 16:
-                PORTD &= ~LED16;
-                break;
-        }
-    }
+void enter(uint8_t pattern){
+    PORTD = (PORTD & 0x0f) << 4;
+    PORTD |= (PORTB & 0xf0) >> 4;
+    PORTB = (PORTB & 0x0f) << 4;
+    PORTB |= pattern;
+    _delay_ms(500);
 }
 
 
-int main(){
-    DDRB |= LED1;
-    DDRB |= LED2;
-    DDRB |= LED3;
-    DDRB |= LED4;
-    DDRB |= LED5;
-    DDRB |= LED6;
-    DDRB |= LED7;
-    DDRB |= LED8;
-    DDRD |= LED9;
-    DDRD |= LED10;
-    DDRD |= LED11;
-    DDRD |= LED12;
-    DDRD |= LED13;
-    DDRD |= LED14;
-    DDRD |= LED15;
-    DDRD |= LED16;
+void draw(uint16_t letter){
     int idx;
-    int columnOneOffset=0;
-    int columnTwoOffset=1;
-    int columnThreeOffset=2;
-    int columnFourOffset=3;
-    int rowOneElement[26]={1,0,1,0,1,0,0,1,1,0,0,1,0,0,0,1,0,1,0,0,1,0,1,1,1,0};
-    int rowTwoElement[26]={1,0,1,0,1,0,1,0,0,1,0,0,1,0,1,0,0,1,1,0,1,0,1,0,1,0};
-    int rowThreeElement[26]={1,0,1,0,1,0,1,1,1,1,0,0,0,1,0,0,0,1,0,1,1,0,1,1,0,0};
-    int rowFourElement[26]={0,1,0,1,0,0,1,0,0,1,0,0,0,1,0,0,0,1,0,0,1,0,1,1,1,0};
+    uint8_t PD_HI = (letter & 0xf000) >> 12;
+    uint8_t PD_LW = (letter & 0x0f00) >> 8;
+    uint8_t PB_HI = (letter & 0x00f0) >> 4;
+    uint8_t PB_LW = (letter & 0x000f);
+
+    enter(PD_HI);
+    enter(PD_LW);
+    enter(PB_HI);
+    enter(PB_LW);
+}
+
+int main(){
+    DDRB=0xff;
+    DDRD=0xff;
+    uint16_t letter;
     while(1){
-        if(columnOneOffset>25){
-            columnOneOffset=0;
+        int i=0;
+        while(MSG[i]!=0){
+            switch(MSG[i]){
+                case 'A':
+                    letter = 0xe55e;
+                    break;
+                case 'B':
+                    letter = 0xfac0;
+                    break;
+                case 'C':
+                    letter = 0x6990;
+                    break;
+                case 'D':
+                    letter = 0xf960;
+                    break;
+                case 'E':
+                    letter = 0xfdb0;
+                    break;
+                case 'F':
+                    letter = 0xf510;
+                    break;
+                case 'G':
+                    letter = 0x69dd;
+                    break;
+                case 'H':
+                    letter = 0xf2f0;
+                    break;
+                case 'I':
+                    letter = 0x9f90;
+                    break;
+                case 'J':
+                    letter = 0x9f10;
+                    break;
+                case 'K':
+                    letter = 0xf4a0;
+                    break;
+                case 'L':
+                    letter = 0xf880;
+                    break;
+            }
+            draw(letter);
+            enter(0x0000);
+            i += 1;
         }
-        if(columnTwoOffset>25){
-            columnTwoOffset=0;
-        }
-        if(columnThreeOffset>25){
-            columnThreeOffset=0;
-        }
-        if(columnFourOffset>25){
-            columnFourOffset=0;
-        }
-        change_LED(1,rowOneElement[columnOneOffset]);
-        change_LED(2,rowOneElement[columnTwoOffset]);
-        change_LED(3,rowOneElement[columnThreeOffset]);
-        change_LED(4,rowOneElement[columnFourOffset]);
-        change_LED(5,rowTwoElement[columnOneOffset]);
-        change_LED(6,rowTwoElement[columnTwoOffset]);
-        change_LED(7,rowTwoElement[columnThreeOffset]);
-        change_LED(8,rowTwoElement[columnFourOffset]);
-        change_LED(9,rowThreeElement[columnOneOffset]);
-        change_LED(10,rowThreeElement[columnTwoOffset]);
-        change_LED(11,rowThreeElement[columnThreeOffset]);
-        change_LED(12,rowThreeElement[columnFourOffset]);
-        change_LED(13,rowFourElement[columnOneOffset]);
-        change_LED(14,rowFourElement[columnTwoOffset]);
-        change_LED(15,rowFourElement[columnThreeOffset]);
-        change_LED(16,rowFourElement[columnFourOffset]);
-        _delay_ms(100);
-        columnOneOffset+=1;
-        columnTwoOffset+=1;
-        columnThreeOffset+=1;
-        columnFourOffset+=1;
     }
-    
-    return 0;
 }
