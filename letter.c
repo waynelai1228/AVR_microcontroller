@@ -134,5 +134,7 @@ int main(){
             enter(0x0000);
             i += 1;
         }
+        enter(0x0000);
+        enter(0x0000);
     }
 }
