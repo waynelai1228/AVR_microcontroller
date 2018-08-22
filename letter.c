@@ -7,7 +7,9 @@
 
 #define DELAY_TIME 200
 
+/*render a column*/
 void enter(uint8_t pattern){
+    /*broadcast the LED state of left LED column to other board*/
     PORTC = 0x00;
     PORTC &= ~(1 << PC0);
     PORTC = ((PORTD & 0x80) >> 4);
@@ -21,6 +23,7 @@ void enter(uint8_t pattern){
     PORTC = 0x00;
     PORTC |= (1 << PC0);
 
+    /*moving all the LED column one to the left*/
     PORTD = (PORTD & 0x0f) << 4;
     PORTD |= (PORTB & 0xf0) >> 4;
     PORTB = (PORTB & 0x0f) << 4;
@@ -28,14 +31,15 @@ void enter(uint8_t pattern){
     _delay_ms(DELAY_TIME+16);
 }
 
-
+/*for drawing letter*/
 void draw(uint16_t letter){
     int idx;
-    uint8_t PD_HI = (letter & 0xf000) >> 12;
-    uint8_t PD_LW = (letter & 0x0f00) >> 8;
-    uint8_t PB_HI = (letter & 0x00f0) >> 4;
-    uint8_t PB_LW = (letter & 0x000f);
+    uint8_t PD_HI = (letter & 0xf000) >> 12; //column on left
+    uint8_t PD_LW = (letter & 0x0f00) >> 8; //column middle left
+    uint8_t PB_HI = (letter & 0x00f0) >> 4; //column middle right;
+    uint8_t PB_LW = (letter & 0x000f); //column right
 
+    /*if the column is empty then do not draw*/
     if(PD_HI != 0x0000){
         enter(PD_HI);
     }
@@ -51,10 +55,10 @@ void draw(uint16_t letter){
 }
 
 int main(){
-    DDRB = 0xff;
+    DDRB = 0xff; // 1 is output 0 is input; setting the direction of pin as output
     DDRD = 0xff;
     DDRC = 0x09;
-    uint16_t letter;
+    uint16_t letter; //this variable stores the hexadecimal representation of LED state on the board
     while(1){
         int i=0;
         while(MSG[i]!=0){

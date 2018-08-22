@@ -7,6 +7,8 @@
 #define DELAY_TIME 200
 
 volatile READ = 0x00;
+
+/*same as enter in letter.c*/
 void enter(uint8_t pattern){
     PORTC = 0x00;
     PORTC &= ~(1 << PC0);
@@ -30,6 +32,8 @@ void enter(uint8_t pattern){
 
 ISR(PCINT1_vect, ISR_BLOCK){
     READ = 0x00;
+
+    /*reading data if broadcast receive is set as transfering*/
     if(!(PINC & 0x04)){
         _delay_ms(2);
         READ |= ((PINC & (1 << PC0)) << 3);
@@ -46,13 +50,19 @@ ISR(PCINT1_vect, ISR_BLOCK){
 }
 
 int main(){
+    /*enable interrupt 1*/
     PCICR = 0x2;
     PCMSK1 = 0x4;
     sei();
+
+    /*initialising pins*/
     DDRB = 0xff;
     DDRD = 0xff;
     DDRC = 0x00;
+
+    /*enable pull up resister on PC2 and PC0*/
     PORTC = ((1 << PC2) | (1 << PC0));
+
     while(1){
     }
 }
