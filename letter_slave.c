@@ -54,6 +54,5 @@ int main(){
     DDRC = 0x00;
     PORTC = ((1 << PC2) | (1 << PC0));
     while(1){
-        enter(READ);
     }
 }
