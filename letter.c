@@ -1,4 +1,4 @@
-#define F_CPU 2000000UL
+#define F_CPU 8000000UL
 
 #define MSG "WAYNE"
 
@@ -6,11 +6,24 @@
 #include <util/delay.h>
 
 void enter(uint8_t pattern){
+    PORTC = 0x00;
+    PORTC &= ~(1<<PC0);
+    PORTC = ((PORTD & 0x80) >> 4);
+    _delay_ms(4);
+    PORTC = ((PORTD & 0x40) >> 3);
+    _delay_ms(4);
+    PORTC = ((PORTD & 0x20) >> 2);
+    _delay_ms(4);
+    PORTC = ((PORTD & 0x10) >> 1);
+    _delay_ms(4);
+    PORTC = 0x00;
+    PORTC |= (1<<PC0);
+
     PORTD = (PORTD & 0x0f) << 4;
     PORTD |= (PORTB & 0xf0) >> 4;
     PORTB = (PORTB & 0x0f) << 4;
     PORTB |= pattern;
-    _delay_ms(150);
+    _delay_ms(500);
 }
 
 
@@ -36,8 +49,9 @@ void draw(uint16_t letter){
 }
 
 int main(){
-    DDRB=0xff;
-    DDRD=0xff;
+    DDRB = 0xff;
+    DDRD = 0xff;
+    DDRC = 0x09;
     uint16_t letter;
     while(1){
         int i=0;

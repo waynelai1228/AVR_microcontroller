@@ -11,6 +11,16 @@ default: $(TARGET).c
 flash: $(TARGET).hex
 	avrdude -p m48 -P $(PORT) -c $(PROGRAMMER) -b $(BAUDRATE) -F -U flash:w:$(TARGET).hex
 
+slave: $(TARGET)_slave.c
+	avr-gcc -mmcu=$(MCU) -O1 -o $(TARGET)_slave.o $(TARGET)_slave.c
+	avr-objcopy -j .text -j .data -O ihex $(TARGET)_slave.o $(TARGET)_slave.hex
+flash-slave: $(TARGET)_slave.hex
+	avrdude -p m48 -P $(PORT) -c $(PROGRAMMER) -b $(BAUDRATE) -F -U flash:w:$(TARGET)_slave.hex
+
+all: default flash
+
+all-slave: slave flash-slave
+
 clean:
 	rm $(TARGET).o $(TARGET).hex
 
