@@ -5,7 +5,7 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
-#define DELAY_TIME 200
+#define DELAY_TIME 50
 
 /*render a column*/
 void enter(uint8_t pattern){
@@ -28,7 +28,7 @@ void enter(uint8_t pattern){
     PORTD |= (PORTB & 0xf0) >> 4;
     PORTB = (PORTB & 0x0f) << 4;
     PORTB |= pattern;
-    _delay_ms(DELAY_TIME+16);
+    _delay_ms(DELAY_TIME);
 }
 
 /*for drawing letter*/
