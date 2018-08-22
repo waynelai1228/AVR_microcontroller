@@ -17,10 +17,13 @@ slave: $(TARGET)_slave.c
 flash-slave: $(TARGET)_slave.hex
 	avrdude -p m48 -P $(PORT) -c $(PROGRAMMER) -b $(BAUDRATE) -F -U flash:w:$(TARGET)_slave.hex
 
-all: default flash
+all: default flash clean
 
-all-slave: slave flash-slave
+all-slave: slave flash-slave clean-slave
 
 clean:
 	rm $(TARGET).o $(TARGET).hex
+
+clean-slave:
+	rm $(TARGET)_slave.o $(TARGET)_slave.hex
 
