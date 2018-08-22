@@ -4,26 +4,43 @@
 #include <util/delay.h>
 #include <avr/interrupt.h>
 
+#define DELAY_TIME 200
 
+volatile READ = 0x00;
 void enter(uint8_t pattern){
+    PORTC = 0x00;
+    PORTC &= ~(1 << PC0);
+    PORTC = ((PORTD & 0x80) >> 4);
+    _delay_ms(4);
+    PORTC = ((PORTD & 0x40) >> 3);
+    _delay_ms(4);
+    PORTC = ((PORTD & 0x20) >> 2);
+    _delay_ms(4);
+    PORTC = ((PORTD & 0x10) >> 1);
+    _delay_ms(4);
+    PORTC = 0x00;
+    PORTC |= (1 << PC0);
+
     PORTD = (PORTD & 0x0f) << 4;
     PORTD |= (PORTB & 0xf0) >> 4;
     PORTB = (PORTB & 0x0f) << 4;
     PORTB |= pattern;
-    _delay_ms(500);
+    _delay_ms(DELAY_TIME);
 }
 
 ISR(PCINT1_vect, ISR_BLOCK){
-    uint8_t READ = 0x00;
+    READ = 0x00;
     if(!(PINC & 0x04)){
         _delay_ms(2);
         READ |= ((PINC & (1 << PC0)) << 3);
         _delay_ms(4);
-        READ |= ((PINC & 0x01) << 2);
+        READ |= ((PINC & (1 << PC0)) << 2);
         _delay_ms(4);
-        READ |= ((PINC & 0x01) << 1);
+        READ |= ((PINC & (1 << PC0)) << 1);
         _delay_ms(4);
-        READ |= (PINC & 0X01);
+        READ |= (PINC & (1 << PC0));
+
+        
         enter(READ);
     }
 }
@@ -35,7 +52,8 @@ int main(){
     DDRB = 0xff;
     DDRD = 0xff;
     DDRC = 0x00;
-    PORTC = 0x04;
+    PORTC = ((1 << PC2) | (1 << PC0));
     while(1){
+        enter(READ);
     }
 }

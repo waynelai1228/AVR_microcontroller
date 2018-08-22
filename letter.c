@@ -5,9 +5,11 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
+#define DELAY_TIME 200
+
 void enter(uint8_t pattern){
     PORTC = 0x00;
-    PORTC &= ~(1<<PC0);
+    PORTC &= ~(1 << PC0);
     PORTC = ((PORTD & 0x80) >> 4);
     _delay_ms(4);
     PORTC = ((PORTD & 0x40) >> 3);
@@ -17,13 +19,13 @@ void enter(uint8_t pattern){
     PORTC = ((PORTD & 0x10) >> 1);
     _delay_ms(4);
     PORTC = 0x00;
-    PORTC |= (1<<PC0);
+    PORTC |= (1 << PC0);
 
     PORTD = (PORTD & 0x0f) << 4;
     PORTD |= (PORTB & 0xf0) >> 4;
     PORTB = (PORTB & 0x0f) << 4;
     PORTB |= pattern;
-    _delay_ms(500);
+    _delay_ms(DELAY_TIME+16);
 }
 
 
